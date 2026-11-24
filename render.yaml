@@ -2,7 +2,7 @@ services:
   - type: worker
     name: jarvis-voice-agent
     runtime: docker
-    branch: jarvis-web
+    branch: main
     plan: 1c-2g
     maxShutdownDelaySeconds: 300
     envVars:
