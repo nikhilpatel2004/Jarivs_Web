@@ -1,149 +1,97 @@
-<a href="https://livekit.io/">
-  <img src="./.github/assets/livekit-mark.png" alt="LiveKit logo" width="100" height="100">
-</a>
+# Jarvis — AI Voice Assistant
 
-# LiveKit Agents starter for Python
+**Jarvis** is a voice AI assistant built with [LiveKit Agents for Python](https://github.com/livekit/agents). It runs a real-time voice pipeline — speech recognition, agent reasoning, and expressive speech synthesis — and extends the agent with desktop control and browser automation tools.
 
-A starter project for building voice AI apps with [LiveKit Agents for Python](https://github.com/livekit/agents) and [LiveKit Cloud](https://cloud.livekit.io/).
+## Project name
 
-## Getting started
+**Jarvis** — an AI voice assistant.
 
-1. Install [uv](https://docs.astral.sh/uv/getting-started/installation/), which manages Python and the project's dependencies.
+## Description
 
-1. Install the [LiveKit CLI](https://docs.livekit.io/intro/basics/cli/) and sign in to LiveKit Cloud:
+Jarvis holds a real-time voice conversation using LiveKit: it listens with AssemblyAI, reasons with an OpenAI-compatible LLM served through an OMNIROUTE gateway, and speaks back with Fish Audio TTS. In addition to the voice loop, the agent can control the user's desktop (scroll, mouse, keyboard, screenshots, screen context) and drive a browser through Playwright.
 
-   - **macOS:** `brew install livekit-cli`
-   - **Linux:** `curl -sSL https://get.livekit.io/cli | bash`
-   - **Windows:** `winget install LiveKit.LiveKitCLI`
+## Features
 
-   Sign up for a free [LiveKit Cloud](https://cloud.livekit.io/) account if you don't have one, then link it to the CLI:
+Features present in the current codebase (`src/agent.py`, `src/tools.py`, `src/browser_manager.py`, `src/playwright_tools.py`):
 
-   ```console
-   lk cloud auth
-   ```
+- Real-time voice pipeline:
+  - STT: AssemblyAI (`assemblyai-stt-3-7-realtime-agent`).
+  - LLM: OpenAI-compatible endpoint provided via the OMNIROUTE gateway.
+  - TTS: Fish Audio S2.1 Pro via LiveKit inference.
+  - Turn detection via LiveKit inference, preemptive generation, expressive TTS, adaptive interruption handling, AI acoustics noise cancellation, and keyterm detection.
+- Desktop control tools:
+  - Scroll, mouse move/click, keyboard press/type, screenshot capture, screen info, active-window info.
+- Browser automation tools (Playwright): start/navigate, accessibility snapshot, text/HTML extraction, element queries, screenshot/PDF, JavaScript evaluation, close.
+- Web search tools backed by DuckDuckGo/DDGS.
 
-1. Create your project from this starter:
+## Tech stack
 
-   ```console
-   lk agent init my-agent --template agent-starter-python
-   ```
+- Python agent: LiveKit Agents for Python (`livekit-agents[images]~=1.8`), LiveKit plugins (AssemblyAI, OpenAI, AI acoustics), LiveKit Inference, Fish Audio TTS, OpenAI-compatible LLM via OMNIROUTE.
+- Desktop/browser tooling: Playwright, pyautogui, pygetwindow, Pillow.
+- Frontend: Flutter app in `livekit_flutter_starter/` (LiveKit Flutter SDK components/client, chat bubbles, etc.).
+- Deployment: Docker (uv-based) → Render (worker).
 
-1. Talk to your agent. Run it in your terminal and speak into your microphone:
+## Project structure
 
-   ```console
-   cd my-agent
-   lk agent console
-   ```
+- `src/agent.py` — main agent server and session (Assistant agent, tools, environment gate).
+- `src/tools.py` — desktop and web tools.
+- `src/browser_manager.py` — browser management (engine, headless, artifacts, profile dirs).
+- `src/playwright_tools.py` — Playwright browser tools.
+- `src/__init__.py`
+- `tests/` — evaluation tests (currently commented out; behavior covered by simulations).
+- `pyproject.toml`, `uv.lock`, `Dockerfile`, `.dockerignore`, `.env.example`, `render.yaml`, `taskfile.yaml`, `scenarios.yaml`.
+- `livekit_flutter_starter/` — Flutter voice assistant frontend.
 
-   If you didn't let `lk agent init` install dependencies, run `uv sync` first.
+## Prerequisites
 
-## What's included
+- Python 3.10–3.14 and `uv`.
+- LiveKit Cloud account/project and credentials (LiveKit URL/API key/API secret), or self-hosted LiveKit server.
+- OMNIROUTE gateway credentials (API key, base URL, model).
+- AssemblyAI API key.
+- For desktop/browser features: a desktop environment with Playwright Chromium available.
 
-The starter includes:
+## Installation and setup
 
-- A simple [voice AI assistant](https://docs.livekit.io/agents/start/voice-ai/) to extend and customize.
-- A voice pipeline built on [LiveKit Inference](https://docs.livekit.io/agents/models/inference/), which gives you access to [models](https://docs.livekit.io/agents/models/) from top labs with no extra configuration:
-  - The default LLM is Gemma 4 31B, an open-weight model [hosted by LiveKit](https://docs.livekit.io/agents/models/llm/livekit/) and tuned for voice AI.
-  - The default TTS is [Fish Audio S2.1 Pro](https://docs.livekit.io/agents/models/tts/fishaudio/), an expressive and cost-effective voice.
-  - More than 50 other models are available from OpenAI, Cartesia, Deepgram, and other providers.
-  - [Realtime models](https://docs.livekit.io/agents/models/realtime/) such as OpenAI GPT-Live. Many other models are available through the [plugin ecosystem](https://docs.livekit.io/agents/models/#plugins).
-- [Expressive mode](https://docs.livekit.io/agents/models/tts/expressive/), on by default, so your agent's voice carries emotion and pacing that fit the conversation.
-- [Keyterms](https://docs.livekit.io/agents/models/stt/keyterms/), on by default, so speech recognition gets your names, brands, and jargon right, including names it picks up during the conversation, like a caller's.
-- [LiveKit Turn Detector](https://docs.livekit.io/agents/logic/turns/turn-detector/), which knows when the user has finished speaking, in 14 languages.
-- [Adaptive interruption handling](https://docs.livekit.io/agents/logic/turns/adaptive-interruption-handling/), which tells a real interruption from an "uh-huh" or background noise, so your agent doesn't stop talking when it shouldn't.
-- [Background voice cancellation](https://docs.livekit.io/transport/media/noise-cancellation/).
-- Session transcripts, traces, and recordings from LiveKit [Agent Observability](https://docs.livekit.io/testing/observability/).
-- [Simulations](https://docs.livekit.io/testing/simulations/) that test full conversations with your agent, run in CI on every merge to `main`.
-- A `Dockerfile` for [deploying to LiveKit Cloud](https://docs.livekit.io/deploy/agents/).
+1. Install `uv` and the LiveKit CLI; sign in to LiveKit Cloud (`lk cloud auth`).
+2. Run `uv sync` to install Python dependencies.
+3. Create `.env.local` from `.env.example` with the required variables (never commit real values).
+4. Review and adjust agent instructions/tools as needed.
 
-The starter works with any [custom web or mobile frontend](https://docs.livekit.io/frontends/) or with [telephony](https://docs.livekit.io/telephony/).
+## Environment variables
 
-## Run the agent
+- `LIVEKIT_URL`
+- `LIVEKIT_API_KEY`
+- `LIVEKIT_API_SECRET`
+- `OMNIROUTE_API_KEY`
+- `OMNIROUTE_BASE_URL`
+- `OMNIROUTE_MODEL`
+- `ASSEMBLYAI_API_KEY`
+- Optional: `JARVIS_BROWSER_ENGINE`, `JARVIS_BROWSER_HEADLESS`, `JARVIS_BROWSER_ARTIFACTS_DIR`, `JARVIS_BROWSER_USER_DATA_DIR`
 
-The `lk agent console`, `lk agent dev`, and `lk agent debugger` commands run your agent on your own machine. To talk to it in your terminal:
+TODO: confirm naming consistency between the required `OMNIROUTE_*` variables and the LLM client key read in `src/agent.py`.
 
-```console
-lk agent console
-```
+## Run locally
 
-To connect it to LiveKit Cloud so a frontend, a phone call, or the [Agent Console](https://docs.livekit.io/testing/agent-console/) can reach it:
+- `uv run src/agent.py dev` (or `lk agent dev`).
+- Console: `lk agent console`.
+- Production start: `uv run src/agent.py start`.
 
-```console
-lk agent dev
-```
+## Run the Flutter app
 
-To let a coding agent or a script test it one text turn at a time, use the [agent debugger](https://docs.livekit.io/testing/debugger/). Each turn prints the agent's reply along with the tool calls and handoffs behind it:
+- `cd livekit_flutter_starter`
+- `flutter pub get`
+- `flutter run`
 
-```console
-lk agent debugger start
-lk agent debugger say "Hi, what can you do?"
-lk agent debugger stop
-```
+## Deploy on Render
 
-In production, run the agent directly:
+- Render worker using the Dockerfile; `render.yaml` configures `type: worker`, `runtime: docker`, `branch: main`, `plan: 1c-2g`, `maxShutdownDelaySeconds: 300`, and environment variables.
 
-```console
-uv run src/agent.py start
-```
+## Troubleshooting
 
-## Frontends and telephony
+- Missing environment variables cause the agent session to raise a `RuntimeError` listing required variables.
+- Browser automation requires Playwright Chromium (installed in the Docker image).
+- TODO: verify Flutter Android Gradle/AGP version mismatch fix steps locally.
 
-Pair the agent with a prebuilt frontend starter, or add telephony:
+## Author
 
-| Platform | Link | Description |
-|----------|----------|-------------|
-| **Web** | [`livekit-examples/agent-starter-react`](https://github.com/livekit-examples/agent-starter-react) | Web voice AI assistant with React & Next.js |
-| **iOS/macOS** | [`livekit-examples/agent-starter-swift`](https://github.com/livekit-examples/agent-starter-swift) | Native iOS, macOS, and visionOS voice AI assistant |
-| **Flutter** | [`livekit-examples/agent-starter-flutter`](https://github.com/livekit-examples/agent-starter-flutter) | Cross-platform voice AI assistant app |
-| **React Native** | [`livekit-examples/voice-assistant-react-native`](https://github.com/livekit-examples/voice-assistant-react-native) | Native mobile app with React Native & Expo |
-| **Android** | [`livekit-examples/agent-starter-android`](https://github.com/livekit-examples/agent-starter-android) | Native Android app with Kotlin & Jetpack Compose |
-| **Web Embed** | [`livekit-examples/agent-starter-embed`](https://github.com/livekit-examples/agent-starter-embed) | Voice AI widget for any website |
-| **Telephony** | [Documentation](https://docs.livekit.io/telephony/) | Add inbound or outbound calling to your agent |
-
-For more options, see the [frontend guide](https://docs.livekit.io/frontends/).
-
-## Testing and debugging
-
-Simulations run full multi-turn conversations between a simulated user and your agent on LiveKit Cloud, then judge each transcript. The scenarios live in [`scenarios.yaml`](scenarios.yaml). Run them locally with the CLI:
-
-```console
-lk agent simulate text --scenarios scenarios.yaml
-```
-
-The `Simulations` workflow in [`.github/workflows/simulations.yml`](.github/workflows/simulations.yml) runs the same file on every merge to `main`, and on demand from the Actions tab. It doesn't run on every pull request push because each run uses real inference. See the [simulations guide](https://docs.livekit.io/testing/simulations/) for how to write scenarios and read results.
-
-To check a change turn by turn without a live session, use the [agent debugger](https://docs.livekit.io/testing/debugger/) shown in [Run the agent](#run-the-agent).
-
-To debug a running agent, open it in the [Agent Console](https://docs.livekit.io/testing/agent-console/). It shows events, tool calls, and model timing as you talk to the agent. To stream logs from a deployed agent, run `lk agent logs`.
-
-## Using coding agents
-
-This project works with coding agents like [Claude Code](https://claude.com/product/claude-code), [Cursor](https://www.cursor.com/), and [Codex](https://openai.com/codex/).
-
-**Agent skills.** Install LiveKit's [agent skills](https://docs.livekit.io/reference/developer-tools/agent-skills/), which teach your coding agent to build, debug, test, and deploy LiveKit agents:
-
-```console
-lk skills install
-```
-
-To get the latest skills, run `lk skills update`.
-
-**`AGENTS.md`.** Teaches your coding agent LiveKit's best practices for workflows, handoffs, and testing, and has it check its changes with the [agent debugger](https://docs.livekit.io/testing/debugger/).
-
-For more, see the [coding agents guide](https://docs.livekit.io/intro/coding-agents/).
-
-## Using this template for your own project
-
-After you create your own project from this template:
-
-- **Commit `uv.lock`.** The template doesn't track it, but your project should, for reproducible builds. If you deploy to LiveKit Cloud, commit `livekit.toml` too.
-- **Commit the agent skills** and `skills-lock.json`, if you installed them in the project.
-- **Add repository secrets.** Add `LIVEKIT_URL`, `LIVEKIT_API_KEY`, and `LIVEKIT_API_SECRET` as [repository secrets](https://docs.github.com/en/actions/how-tos/writing-workflows/choosing-what-your-workflow-does/using-secrets-in-github-actions) so the simulations can run in CI.
-
-## Deploying to production
-
-To deploy the agent to LiveKit Cloud, see the [deployment guide](https://docs.livekit.io/deploy/agents/).
-
-## License
-
-This project is licensed under the MIT License. See [LICENSE](LICENSE) for details.
+- nikhilpatel2004
