@@ -68,7 +68,7 @@ Features present in the current codebase (`src/agent.py`, `src/tools.py`, `src/b
 - `ASSEMBLYAI_API_KEY`
 - Optional: `JARVIS_BROWSER_ENGINE`, `JARVIS_BROWSER_HEADLESS`, `JARVIS_BROWSER_ARTIFACTS_DIR`, `JARVIS_BROWSER_USER_DATA_DIR`
 
-TODO: confirm naming consistency between the required `OMNIROUTE_*` variables and the LLM client key read in `src/agent.py`.
+All `OMNIROUTE_*` variable names above are used consistently across the agent code, `render.yaml`, and `.env.example`.
 
 ## Run locally
 
