@@ -1,0 +1,22 @@
+services:
+  - type: worker
+    name: jarvis-voice-agent
+    runtime: docker
+    branch: jarvis-web
+    plan: 1c-2g
+    maxShutdownDelaySeconds: 300
+    envVars:
+      - key: LIVEKIT_URL
+        sync: false
+      - key: LIVEKIT_API_KEY
+        sync: false
+      - key: LIVEKIT_API_SECRET
+        sync: false
+      - key: OMNIROUTE_API_KEY
+        sync: false
+      - key: OMNIROUTE_BASE_URL
+        sync: false
+      - key: OMNIROUTE_MODEL
+        sync: false
+      - key: ASSEMBLYAI_API_KEY
+        sync: false

@@ -80,6 +80,9 @@ COPY --from=build --chown=appuser:appuser /app /app
 
 WORKDIR /app
 
+# Install Playwright browser binaries required by the browser automation tools.
+RUN /app/.venv/bin/playwright install --with-deps chromium
+
 # Switch to the non-privileged user for all subsequent operations
 # This improves security by not running as root
 USER appuser
