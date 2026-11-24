@@ -80,6 +80,10 @@ COPY --from=build --chown=appuser:appuser /app /app
 
 WORKDIR /app
 
+# Playwright's bundled Node needs libatomic.so.1 before the browser installer can run.
+RUN apt-get update && apt-get install -y --no-install-recommends libatomic1 \
+    && rm -rf /var/lib/apt/lists/*
+
 # Install Playwright browser binaries required by the browser automation tools.
 RUN /app/.venv/bin/playwright install --with-deps chromium
 

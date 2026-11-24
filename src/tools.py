@@ -7,10 +7,29 @@ from datetime import datetime
 from pathlib import Path
 from urllib.parse import quote_plus
 
-import pyautogui
-import pygetwindow as gw
 from ddgs import DDGS
 from livekit.agents import function_tool, RunContext
+
+
+class _DesktopUnavailable:
+    """Placeholder so this module imports on headless/cloud hosts."""
+
+    FAILSAFE = False
+    PAUSE = 0
+
+    def __getattr__(self, name):
+        raise RuntimeError("Desktop control is not available on this host.")
+
+
+try:
+    import pyautogui
+except Exception:  # no DISPLAY on headless/cloud hosts
+    pyautogui = _DesktopUnavailable()
+
+try:
+    import pygetwindow as gw
+except Exception:  # no DISPLAY on headless/cloud hosts
+    gw = _DesktopUnavailable()
 
 logger = logging.getLogger("jarvis-tools")
 
@@ -164,19 +183,15 @@ async def click_mouse(
 
     click_type = click_type.lower().strip()
 
-    if click_type == "single":
-        action = pyautogui.click
-
-    elif click_type == "double":
-        action = pyautogui.doubleClick
-
-    elif click_type == "right":
-        action = pyautogui.rightClick
-
-    else:
+    if click_type not in ("single", "double", "right"):
         return "Use single, double or right."
 
     try:
+        action = {
+            "single": pyautogui.click,
+            "double": pyautogui.doubleClick,
+            "right": pyautogui.rightClick,
+        }[click_type]
         await asyncio.to_thread(action)
         return f"{click_type} click completed."
 
