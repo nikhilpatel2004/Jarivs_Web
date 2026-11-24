@@ -31,3 +31,13 @@ KMS
 
 # GitHub CLI
 .github/personal-instructions.md
+
+# Build artifacts
+build/
+dist/
+*.apk
+*.aab
+*.ipa
+
+# Flutter application sources (excluded from the web deployment)
+livekit_flutter_starter/
